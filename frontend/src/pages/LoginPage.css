@@ -1,0 +1,169 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #faf8f5 0%, #f0ebe3 50%, #e8dfd0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem;
+}
+
+.back-home {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.back-home:hover {
+  transform: translateX(-4px);
+}
+
+.login-container {
+  width: 100%;
+  max-width: 450px;
+}
+
+.login-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+
+.login-title {
+  font-size: 2.25rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1);
+}
+
+.input-wrapper svg {
+  color: var(--text-light);
+}
+
+.input-wrapper input {
+  border: none;
+  padding: 12px 0;
+  flex: 1;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: var(--text-light);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.divider span {
+  padding: 0 1rem;
+}
+
+.btn-google {
+  width: 100%;
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-google:hover {
+  background: var(--bg);
+  border-color: var(--secondary);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-google img {
+  width: 20px;
+  height: 20px;
+}
+
+.toggle-text {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--text-light);
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.toggle-button:hover {
+  color: var(--primary);
+  transform: none;
+  box-shadow: none;
+}

@@ -61,6 +61,7 @@ class Product(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
+    slug: str = ""  # SEO-friendly URL slug
     description: str
     category: str  # men, women, cardholder
     price: float

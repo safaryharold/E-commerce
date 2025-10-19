@@ -45,6 +45,53 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Add your routes to the router instead of directly to app
+@api_router.get("/")
+async def root():
+    return {
+        "message": "Leather Wallet Shop API",
+        "version": "1.0",
+        "endpoints": {
+            "products": {
+                "GET /api/products": "Get all products",
+                "GET /api/products/category/{category}": "Get products by category (men/women/cardholder)",
+                "GET /api/products/{slug}": "Get product by slug",
+                "POST /api/products": "Create product (Admin only)",
+                "PUT /api/products/{id}": "Update product (Admin only)",
+                "DELETE /api/products/{id}": "Delete product (Admin only)"
+            },
+            "auth": {
+                "POST /api/auth/register": "Register new user",
+                "POST /api/auth/login": "Login with email/password",
+                "POST /api/auth/session": "Process Google OAuth session",
+                "POST /api/auth/logout": "Logout",
+                "GET /api/auth/me": "Get current user"
+            },
+            "cart": {
+                "GET /api/cart": "Get cart items (Auth required)",
+                "POST /api/cart": "Add to cart (Auth required)",
+                "PUT /api/cart/{product_id}": "Update cart quantity (Auth required)",
+                "DELETE /api/cart/{product_id}": "Remove from cart (Auth required)"
+            },
+            "orders": {
+                "GET /api/orders": "Get orders (Auth required)",
+                "GET /api/orders/{id}": "Get order by ID (Auth required)",
+                "POST /api/orders": "Create order (Auth required)",
+                "PUT /api/orders/{id}/status": "Update order status (Admin only)"
+            },
+            "checkout": {
+                "POST /api/checkout/session": "Create Stripe checkout session (Auth required)",
+                "GET /api/checkout/status/{session_id}": "Get payment status (Auth required)"
+            },
+            "admin": {
+                "POST /api/seed": "Seed database with sample data"
+            }
+        },
+        "admin_credentials": {
+            "email": "admin@leatherwallet.pk",
+            "password": "admin123"
+        }
+    }
 # ============ MODELS ============
 
 class User(BaseModel):

@@ -346,6 +346,10 @@ async def create_product(product_data: ProductCreate, user: dict = Depends(get_a
 
 @api_router.put("/products/{product_id}")
 async def update_product(product_id: str, product_data: ProductCreate, user: dict = Depends(get_admin_user)):
+    # Auto-generate slug if not provided
+    if not product_data.slug:
+        product_data.slug = generate_slug(product_data.name)
+    
     result = await db.products.update_one(
         {"id": product_id},
         {"$set": product_data.model_dump()}

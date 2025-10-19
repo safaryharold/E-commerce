@@ -13,9 +13,18 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Helper function to generate slug
+def generate_slug(name: str) -> str:
+    """Generate SEO-friendly slug from product name"""
+    slug = name.lower()
+    slug = re.sub(r'[^a-z0-9]+', '-', slug)
+    slug = slug.strip('-')
+    return slug
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']

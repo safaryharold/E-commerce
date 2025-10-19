@@ -1,0 +1,155 @@
+.orders-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.orders-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 3rem 24px;
+}
+
+.orders-title {
+  font-size: 3rem;
+  color: var(--primary);
+  margin-bottom: 2rem;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.no-orders svg {
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.no-orders h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.no-orders p {
+  color: var(--text-light);
+  font-size: 1.125rem;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.order-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.order-id {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.order-date {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.order-items {
+  margin-bottom: 1.5rem;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-delivery {
+  background: var(--bg);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.order-delivery p {
+  color: var(--text);
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.order-delivery p:last-child {
+  margin-bottom: 0;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.payment-status {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.payment-status span {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.payment-status .paid {
+  color: #22c55e;
+}
+
+.payment-status .pending {
+  color: #f59e0b;
+}
+
+.payment-status .failed {
+  color: #ef4444;
+}
+
+.order-total {
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.order-total strong {
+  color: var(--secondary);
+}

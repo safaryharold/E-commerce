@@ -304,9 +304,21 @@ async def get_products(category: Optional[str] = None):
     products = await db.products.find(query, {"_id": 0}).to_list(1000)
     return products
 
-@api_router.get("/products/{product_id}")
-async def get_product(product_id: str):
-    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+@api_router.get("/products/category/{category}")
+async def get_products_by_category(category: str):
+    """Get products by category using path parameter"""
+    products = await db.products.find({"category": category}, {"_id": 0}).to_list(1000)
+    return products
+
+@api_router.get("/products/{product_slug}")
+async def get_product(product_slug: str):
+    # Try to find by slug first
+    product = await db.products.find_one({"slug": product_slug}, {"_id": 0})
+    
+    # Fallback to ID for backward compatibility
+    if not product:
+        product = await db.products.find_one({"id": product_slug}, {"_id": 0})
+    
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product

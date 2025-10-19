@@ -69,10 +69,10 @@ export function AuthProvider({ children }) {
       window.history.replaceState({}, document.title, window.location.pathname);
       
       // Redirect to main app
-      navigate('/');
+      window.location.href = '/';
     } catch (error) {
       console.error('Google auth error:', error);
-      navigate('/login');
+      window.location.href = '/login';
     } finally {
       setLoading(false);
     }

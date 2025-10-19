@@ -678,6 +678,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Classic Brown Leather Wallet",
+            "slug": "classic-brown-leather-wallet",
             "description": "Premium genuine leather wallet with multiple card slots and bill compartments. Perfect for everyday use.",
             "category": "men",
             "price": 45.00,
@@ -688,6 +689,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Executive Black Bifold",
+            "slug": "executive-black-bifold",
             "description": "Sophisticated black leather bifold wallet. Slim design with RFID protection.",
             "category": "men",
             "price": 55.00,
@@ -698,6 +700,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Minimalist Card Holder",
+            "slug": "minimalist-card-holder",
             "description": "Sleek gray leather card holder. Perfect for carrying essentials only.",
             "category": "cardholder",
             "price": 25.00,
@@ -708,6 +711,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Women's Elegant Wallet",
+            "slug": "womens-elegant-wallet",
             "description": "Beautiful handcrafted leather wallet with zipper closure. Multiple compartments for cards and cash.",
             "category": "women",
             "price": 50.00,
@@ -718,6 +722,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Premium Black Wallet",
+            "slug": "premium-black-wallet",
             "description": "Luxury black leather wallet with gold accents. Features multiple card slots and coin pocket.",
             "category": "men",
             "price": 65.00,
@@ -728,6 +733,7 @@ async def seed_data():
         {
             "id": str(uuid.uuid4()),
             "name": "Slim Black Card Case",
+            "slug": "slim-black-card-case",
             "description": "Ultra-slim black leather card case. Holds 4-6 cards comfortably.",
             "category": "cardholder",
             "price": 30.00,

@@ -334,6 +334,10 @@ async def get_product(product_slug: str):
 
 @api_router.post("/products", response_model=Product)
 async def create_product(product_data: ProductCreate, user: dict = Depends(get_admin_user)):
+    # Auto-generate slug if not provided
+    if not product_data.slug:
+        product_data.slug = generate_slug(product_data.name)
+    
     product = Product(**product_data.model_dump())
     doc = product.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()

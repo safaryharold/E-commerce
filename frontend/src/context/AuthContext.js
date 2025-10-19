@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     document.cookie = 'session_token=; path=/; max-age=0';
     setUser(null);
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const getCookie = (name) => {

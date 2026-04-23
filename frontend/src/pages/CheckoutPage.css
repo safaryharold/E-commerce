@@ -91,6 +91,48 @@
   color: var(--text-light);
 }
 
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.payment-option:hover {
+  border-color: var(--secondary);
+}
+
+.payment-option.selected {
+  border-color: var(--secondary);
+  background: #fff;
+}
+
+.payment-option input[type="radio"] {
+  accent-color: var(--secondary);
+  width: 18px;
+  height: 18px;
+}
+
+.payment-option svg {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.payment-option p {
+  margin: 0;
+}
+
 .submit-btn {
   width: 100%;
   font-size: 1.125rem;

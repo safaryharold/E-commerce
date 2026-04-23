@@ -40,7 +40,15 @@ JWT_EXPIRATION_DAYS = 7
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 
 # Create the main app without a prefix
-app = FastAPI()
+# docs_url/openapi_url are prefixed with /api so they're reachable through
+# the Kubernetes ingress (which only forwards /api/* to this service).
+app = FastAPI(
+    title="Leather Wallet Shop API",
+    version="1.0",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -157,6 +165,7 @@ class Order(BaseModel):
     delivery_address: str
     delivery_phone: str
     status: str = "pending"  # pending, processing, shipped, delivered
+    payment_method: str = "stripe"  # stripe, jazzcash, easypaisa, cod
     payment_status: str = "pending"  # pending, paid, failed
     payment_session_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -165,6 +174,7 @@ class OrderCreate(BaseModel):
     delivery_city: str
     delivery_address: str
     delivery_phone: str
+    payment_method: str = "stripe"  # stripe, jazzcash, easypaisa, cod
 
 class PaymentTransaction(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -513,7 +523,8 @@ async def create_order(order_data: OrderCreate, user: dict = Depends(get_current
         total_amount=total,
         delivery_city=order_data.delivery_city,
         delivery_address=order_data.delivery_address,
-        delivery_phone=order_data.delivery_phone
+        delivery_phone=order_data.delivery_phone,
+        payment_method=order_data.payment_method,
     )
     
     doc = order.model_dump()
@@ -710,6 +721,83 @@ async def stripe_webhook(request: Request):
     except Exception as e:
         logging.error(f"Webhook error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+
+# ============ MOCK LOCAL PAYMENTS (JazzCash / EasyPaisa / COD) ============
+# These are simulated flows for development/testing. In production these would
+# be replaced with real JazzCash/EasyPaisa merchant integrations.
+
+class MockPayRequest(BaseModel):
+    order_id: str
+    method: str  # jazzcash | easypaisa | cod
+    mobile_number: Optional[str] = None  # mock wallet number
+    cnic_last4: Optional[str] = None     # mock CNIC (JazzCash/EasyPaisa require this)
+
+@api_router.post("/payments/mock/initiate")
+async def mock_payment_initiate(payload: MockPayRequest, user: dict = Depends(get_current_user)):
+    """Simulate a JazzCash/EasyPaisa/COD transaction. No real money moves."""
+    if payload.method not in {"jazzcash", "easypaisa", "cod"}:
+        raise HTTPException(status_code=400, detail="Unsupported payment method")
+
+    order = await db.orders.find_one({"id": payload.order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order['user_id'] != user['id']:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Basic mock validation for wallet methods
+    if payload.method in {"jazzcash", "easypaisa"}:
+        if not payload.mobile_number or len(payload.mobile_number) < 10:
+            raise HTTPException(status_code=400, detail="Valid mobile number required")
+        if not payload.cnic_last4 or len(payload.cnic_last4) != 4:
+            raise HTTPException(status_code=400, detail="Last 4 digits of CNIC required")
+
+    mock_session_id = f"MOCK-{payload.method.upper()}-{uuid.uuid4().hex[:12]}"
+
+    # Record a payment transaction row for traceability
+    transaction = PaymentTransaction(
+        session_id=mock_session_id,
+        order_id=payload.order_id,
+        user_id=user['id'],
+        amount=float(order['total_amount']),
+        currency="pkr",
+        payment_status="paid" if payload.method != "cod" else "pending",
+        status="completed" if payload.method != "cod" else "initiated",
+        metadata={"method": payload.method, "mock": True},
+    )
+    trans_doc = transaction.model_dump()
+    trans_doc['created_at'] = trans_doc['created_at'].isoformat()
+    trans_doc['updated_at'] = trans_doc['updated_at'].isoformat()
+    await db.payment_transactions.insert_one(trans_doc)
+
+    # For wallets: instantly mark as paid. For COD: keep pending until delivered.
+    if payload.method in {"jazzcash", "easypaisa"}:
+        await db.orders.update_one(
+            {"id": payload.order_id},
+            {"$set": {
+                "payment_status": "paid",
+                "status": "processing",
+                "payment_method": payload.method,
+                "payment_session_id": mock_session_id,
+            }}
+        )
+    else:  # cod
+        await db.orders.update_one(
+            {"id": payload.order_id},
+            {"$set": {
+                "payment_status": "pending",
+                "status": "processing",
+                "payment_method": "cod",
+                "payment_session_id": mock_session_id,
+            }}
+        )
+
+    return {
+        "session_id": mock_session_id,
+        "method": payload.method,
+        "payment_status": "paid" if payload.method != "cod" else "pending",
+        "order_id": payload.order_id,
+        "message": f"Mock {payload.method.upper()} transaction successful" if payload.method != "cod" else "Cash on Delivery order placed",
+    }
 
 # ============ SEED DATA ============
 

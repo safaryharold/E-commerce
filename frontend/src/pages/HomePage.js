@@ -68,21 +68,21 @@ export default function HomePage() {
         <div className="container">
           <h2 className="section-title">Shop by Category</h2>
           <div className="categories-grid">
-            <Link to="/products?category=men" className="category-card" data-testid="category-men">
+            <Link to="/products/category/men" className="category-card" data-testid="category-men">
               <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?w=600" alt="Men's Wallets" />
               <div className="category-overlay">
                 <h3>Men's Wallets</h3>
               </div>
             </Link>
 
-            <Link to="/products?category=women" className="category-card" data-testid="category-women">
+            <Link to="/products/category/women" className="category-card" data-testid="category-women">
               <img src="https://images.unsplash.com/photo-1611688599669-e0d5a0497670?w=600" alt="Women's Wallets" />
               <div className="category-overlay">
                 <h3>Women's Wallets</h3>
               </div>
             </Link>
 
-            <Link to="/products?category=cardholder" className="category-card" data-testid="category-cardholder">
+            <Link to="/products/category/cardholder" className="category-card" data-testid="category-cardholder">
               <img src="https://images.unsplash.com/photo-1676276550349-580c49631496?w=600" alt="Card Holders" />
               <div className="category-overlay">
                 <h3>Card Holders</h3>

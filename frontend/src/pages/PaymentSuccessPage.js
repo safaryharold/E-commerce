@@ -16,8 +16,15 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState('checking'); // checking, success, failed
   const [orderId, setOrderId] = useState(null);
   const sessionId = searchParams.get('session_id');
+  const isMock = searchParams.get('mock') === '1';
+  const mockOrderId = searchParams.get('order_id');
 
   useEffect(() => {
+    if (isMock && mockOrderId) {
+      setStatus('success');
+      setOrderId(mockOrderId);
+      return;
+    }
     if (!sessionId) {
       navigate('/cart');
       return;

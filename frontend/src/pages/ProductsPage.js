@@ -1,74 +1,75 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
-import { Filter } from 'lucide-react';
 import './ProductsPage.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function ProductsPage() {
+  const { category } = useParams(); // comes from /products/category/:category
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const category = searchParams.get('category');
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const url = category
+          ? `${API}/products/category/${category}`
+          : `${API}/products`;
+        const response = await axios.get(url);
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchProducts();
   }, [category]);
 
-  const fetchProducts = async () => {
-    try {
-      const url = category ? `${API}/products?category=${category}` : `${API}/products`;
-      const response = await axios.get(url);
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const filterByCategory = (cat) => {
     if (cat) {
-      setSearchParams({ category: cat });
+      navigate(`/products/category/${cat}`);
     } else {
-      setSearchParams({});
+      navigate('/products');
     }
   };
 
   return (
     <div className="products-page">
       <Navbar />
-      
+
       <div className="products-container">
         <div className="products-header">
           <h1 className="products-title" data-testid="products-title">Our Collection</h1>
-          
+
           <div className="filter-buttons" data-testid="filter-buttons">
-            <button 
+            <button
               className={`filter-btn ${!category ? 'active' : ''}`}
               onClick={() => filterByCategory(null)}
               data-testid="filter-all"
             >
               All
             </button>
-            <button 
+            <button
               className={`filter-btn ${category === 'men' ? 'active' : ''}`}
               onClick={() => filterByCategory('men')}
               data-testid="filter-men"
             >
               Men
             </button>
-            <button 
+            <button
               className={`filter-btn ${category === 'women' ? 'active' : ''}`}
               onClick={() => filterByCategory('women')}
               data-testid="filter-women"
             >
               Women
             </button>
-            <button 
+            <button
               className={`filter-btn ${category === 'cardholder' ? 'active' : ''}`}
               onClick={() => filterByCategory('cardholder')}
               data-testid="filter-cardholder"
@@ -85,9 +86,9 @@ export default function ProductsPage() {
             {products.map((product) => (
               <Link
                 key={product.id}
-                to={`/products/${product.id}`}
+                to={`/products/${product.slug || product.id}`}
                 className="product-card"
-                data-testid={`product-card-${product.id}`}
+                data-testid={`product-card-${product.slug || product.id}`}
               >
                 <div className="product-image">
                   <img src={product.image_url} alt={product.name} />

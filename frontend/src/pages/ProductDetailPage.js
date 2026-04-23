@@ -11,7 +11,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { user, getAuthHeader } = useAuth();
   const [product, setProduct] = useState(null);
@@ -21,11 +21,11 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     fetchProduct();
-  }, [id]);
+  }, [slug]);
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`${API}/products/${id}`);
+      const response = await axios.get(`${API}/products/${slug}`);
       setProduct(response.data);
     } catch (error) {
       console.error('Error fetching product:', error);

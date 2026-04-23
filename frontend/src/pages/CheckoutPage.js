@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import { MapPin, Phone, CreditCard } from 'lucide-react';
+import { MapPin, Phone, CreditCard, Smartphone, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 import './CheckoutPage.css';
 
@@ -15,12 +15,20 @@ const PAKISTANI_CITIES = [
   'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala'
 ];
 
+const PAYMENT_METHODS = [
+  { id: 'stripe', label: 'Credit / Debit Card (Stripe)', icon: CreditCard, desc: 'International cards via Stripe' },
+  { id: 'jazzcash', label: 'JazzCash Mobile Wallet', icon: Smartphone, desc: 'Pay with your JazzCash wallet (mock flow)' },
+  { id: 'easypaisa', label: 'EasyPaisa Mobile Wallet', icon: Smartphone, desc: 'Pay with your EasyPaisa wallet (mock flow)' },
+  { id: 'cod', label: 'Cash on Delivery', icon: Banknote, desc: 'Pay in cash when your order arrives' },
+];
+
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { getAuthHeader } = useAuth();
   const [cart, setCart] = useState({ items: [] });
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('stripe');
   const [formData, setFormData] = useState({
     delivery_city: 'Karachi',
     delivery_address: '',
@@ -35,7 +43,7 @@ export default function CheckoutPage() {
     try {
       const response = await axios.get(`${API}/cart`, { headers: getAuthHeader() });
       setCart(response.data);
-      
+
       if (response.data.items.length === 0) {
         toast.error('Your cart is empty');
         navigate('/cart');
@@ -56,27 +64,40 @@ export default function CheckoutPage() {
     setProcessing(true);
 
     try {
-      // Create order
+      // Create order with chosen payment method
       const orderResponse = await axios.post(
         `${API}/orders`,
-        formData,
+        { ...formData, payment_method: paymentMethod },
         { headers: getAuthHeader() }
       );
 
       const { order_id } = orderResponse.data;
 
-      // Create checkout session
-      const sessionResponse = await axios.post(
-        `${API}/checkout/session`,
-        {
-          order_id,
-          origin_url: window.location.origin
-        },
-        { headers: getAuthHeader() }
-      );
+      if (paymentMethod === 'stripe') {
+        // Stripe hosted checkout
+        const sessionResponse = await axios.post(
+          `${API}/checkout/session`,
+          { order_id, origin_url: window.location.origin },
+          { headers: getAuthHeader() }
+        );
+        window.location.href = sessionResponse.data.url;
+        return;
+      }
 
-      // Redirect to Stripe
-      window.location.href = sessionResponse.data.url;
+      if (paymentMethod === 'cod') {
+        // Skip the mock wallet screen, place order directly
+        await axios.post(
+          `${API}/payments/mock/initiate`,
+          { order_id, method: 'cod' },
+          { headers: getAuthHeader() }
+        );
+        toast.success('Order placed! Pay when it arrives.');
+        navigate('/orders');
+        return;
+      }
+
+      // JazzCash / EasyPaisa mock flow — send user to the mock wallet screen
+      navigate(`/payment/mock?order_id=${order_id}&method=${paymentMethod}`);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Checkout failed');
       setProcessing(false);
@@ -95,7 +116,7 @@ export default function CheckoutPage() {
   return (
     <div className="checkout-page">
       <Navbar />
-      
+
       <div className="checkout-container">
         <h1 className="checkout-title" data-testid="checkout-title">Checkout</h1>
 
@@ -154,12 +175,28 @@ export default function CheckoutPage() {
 
             <div className="form-section">
               <h2>Payment Method</h2>
-              <div className="payment-info">
-                <CreditCard size={24} />
-                <div>
-                  <p><strong>Stripe Payment Gateway</strong></p>
-                  <p className="payment-desc">Secure payment with Stripe (International cards supported)</p>
-                </div>
+              <div className="payment-methods" data-testid="payment-methods">
+                {PAYMENT_METHODS.map(({ id, label, icon: Icon, desc }) => (
+                  <label
+                    key={id}
+                    className={`payment-option ${paymentMethod === id ? 'selected' : ''}`}
+                    data-testid={`payment-option-${id}`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value={id}
+                      checked={paymentMethod === id}
+                      onChange={() => setPaymentMethod(id)}
+                      data-testid={`payment-radio-${id}`}
+                    />
+                    <Icon size={24} />
+                    <div>
+                      <p><strong>{label}</strong></p>
+                      <p className="payment-desc">{desc}</p>
+                    </div>
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -175,7 +212,7 @@ export default function CheckoutPage() {
 
           <div className="order-summary" data-testid="order-summary">
             <h2>Order Summary</h2>
-            
+
             <div className="summary-items">
               {cart.items.map((item) => (
                 <div key={item.id} className="summary-item" data-testid={`summary-item-${item.product_id}`}>
